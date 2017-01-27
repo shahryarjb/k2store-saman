@@ -64,7 +64,7 @@ class plgK2StorePayment_trangellsaman extends K2StorePaymentPlugin
 			$vars->reservationNumber = time();
 			$vars->totalAmount =  round($vars->orderpayment_amount,0);
 			$vars->callBackUrl  = JRoute::_(JURI::root(). "index.php?option=com_k2store&view=checkout" ) .'&orderpayment_id='.$vars->orderpayment_id . '&orderpayment_type=' . $vars->orderpayment_type .'&task=confirmPayment';
-			$vars->sendUrl = "https\://sep.shaparak.ir/Payment.aspx";
+			$vars->sendUrl = "https://sep.shaparak.ir/Payment.aspx";
 			$html = $this->_getLayout('prepayment', $vars);
 			return $html;
 		}
@@ -77,7 +77,6 @@ class plgK2StorePayment_trangellsaman extends K2StorePaymentPlugin
 		$orderpayment_id = $jinput->get->get('orderpayment_id', '0', 'INT');
         JTable::addIncludePath( JPATH_ADMINISTRATOR.'/components/com_k2store/tables' );
         $orderpayment = JTable::getInstance('Orders', 'Table');
-		$customer_note = $orderpayment->customer_note;
 		//==========================================================================
 		$resNum = $jinput->post->get('ResNum', '0', 'INT');
 		$trackingCode = $jinput->post->get('TRACENO', '0', 'INT');
@@ -92,11 +91,11 @@ class plgK2StorePayment_trangellsaman extends K2StorePaymentPlugin
 		$cardNumber = $jinput->post->get('SecurePan', 'empty', 'STRING'); 
 		if (checkHack::strip($cardNumber) != $cardNumber )
 			$cardNumber = "illegal";
-			
-		$price = round($orderpayment->order_total,0); 
+	
 		$merchantId = $this->params->get('samanmerchantId', '');	
 
-	    if ($orderpayment->load( $orderpayment_id ) != null){
+	    if ($orderpayment->load( $orderpayment_id )){
+			$customer_note = $orderpayment->customer_note;
 			if($orderpayment->id == $orderpayment_id) {
 				if (
 					checkHack::checkNum($resNum) &&
@@ -108,7 +107,7 @@ class plgK2StorePayment_trangellsaman extends K2StorePaymentPlugin
 							$out    = new SoapClient('https://sep.shaparak.ir/payments/referencepayment.asmx?WSDL');
 							$resultCode    = $out->VerifyTransaction($refNum, $merchantId);
 						
-							if ($resultCode == $price) {
+							if ($resultCode == round($orderpayment->order_total,0)) {
 								$msg= $this->getGateMsg(1); 
 								$this->saveStatus($msg,1,$customer_note,'ok',$trackingCode,$orderpayment,$cardNumber);
 								$app->enqueueMessage($trackingCode . ' کد پیگیری شما', 'message');	
@@ -181,8 +180,11 @@ class plgK2StorePayment_trangellsaman extends K2StorePaymentPlugin
 		$html .='<strong>'.JText::_('K2STORE_BANK_TRANSFER_INSTRUCTIONS').'</strong>';
 		$html .='<br />';
 		if (isset($trackingCode)){
+			$html .= '<br />';
 			$html .= $trackingCode .'شماره پیگری ';
+			$html .= '<br />';
 			$html .= $CardNumber .' شماره کارت ';
+			$html .= '<br />';
 		}
 		$html .='<br />' . $msg;
 		$orderpayment->customer_note =$customer_note.$html;

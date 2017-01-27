@@ -19,6 +19,7 @@
 	</config>
 	<files>
 		<filename plugin="payment_trangellsaman">payment_trangellsaman.php</filename>
+		<filename plugin="payment_trangellsaman">trangell_inputcheck.php</filename>
 		<filename>index.html</filename>
 		<folder>payment_trangellsaman</folder>
 	</files>

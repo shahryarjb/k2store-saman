@@ -10,7 +10,7 @@
 
 defined('_JEXEC') or die('Restricted access'); ?>
 
-<form action="<?php echo @$vars->sendUrl; ?>" method="post" name="adminForm" enctype="multipart/form-data">
+<form action="<?php echo @$vars->sendUrl; ?>" method="post" name="adminForm" target="_self">
 	<p><?php echo 'درگاه بانک سامان' ?></p>
 	<input type="submit" class="k2store_cart_button btn btn-primary" value="<?php echo JText::_($vars->button_text); ?>" />
     <input type='hidden' name='Amount' value='<?php echo @$vars->totalAmount; ?>'>
